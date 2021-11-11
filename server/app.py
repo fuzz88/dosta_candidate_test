@@ -7,7 +7,7 @@ candidates_db = [
     {"Alice": {"skills": 8.2, "tools": ["postgres", "git", "python"]}},
     {
         "Bob": {
-            "skills": 8 if random.random() > 0.3 else 8.1,
+            "skills": 8 if random.random() > 0.323 else 8.1,
             "tools": ["php", "git", "mysql"],
         }
     },
