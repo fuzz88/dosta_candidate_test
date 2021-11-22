@@ -15,12 +15,13 @@ class QueriesToServer:
     также производит валидацию данных. при ошибке валидации выкидывает CustomValidationError.
     """
 
-    def __init__(self, url: str) -> None:
+    def __init__(self, QueryToServerConfig) -> None:
         """
         TODO
         """
         # вот сюда нужно передать объект конфигурации с этим урлом
-        self.url = url
+        configs = QueryToServerConfig()
+        self.url = configs.url
 
     def _get_candidates(self) -> list:
         """
