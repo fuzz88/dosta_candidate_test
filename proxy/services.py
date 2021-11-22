@@ -37,7 +37,7 @@ class QueriesToServer:
         """
         # на такого размера кусках кода уже можно немного комментить
         results = []
-        error_count= 0
+        error_count = None
         candidates_names = self._get_candidates()
         # внимательней к названиям.
         for candidate_name in candidates_names:
