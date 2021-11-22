@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from services import QueriesToServer
+from services import QueryData
 from config import QueryToServerConfig
 
 
@@ -11,7 +11,7 @@ def get_candidates():
     """
     Делает запрос на server и возвращает полную информацию о кандидатах
     """
-    query = QueriesToServer(QueryToServerConfig)
+    query = QueryData(QueryToServerConfig)
     candidates_data, validation_errors = query.get_data()
     results = jsonify(candidates_data)
     if validation_errors is None: # вот эту строчку изменять нельзя
