@@ -1,60 +1,53 @@
 import requests, json
 
 
-# нейминг объектов самое интересное в программировании)
-# названия должны кратчайшим способом описывать финальное предназначение объекта.
-# это важно для читаемости. твой вариант не плох, но
-# смотри какие ещё есть: ServerData, ExternalAPI, QueryData ...
-class QueriesToServer:
+class QueryData:
     """
-    Здесь всегда должен располагаться doc-string, который описывает назначение класса.
-
-    Например:
-    класс для получения данных от server.
-
-    также производит валидацию данных. при ошибке валидации выкидывает CustomValidationError.
+    Класс для получения данных от server.
     """
-
-    def __init__(self, QueryToServerConfig) -> None:
+    def __init__(self, QueryToServerConfig):
         """
-        TODO
+        Инициализация класса с конфигами
         """
-        # вот сюда нужно передать объект конфигурации с этим урлом
         configs = QueryToServerConfig()
         self.url = configs.url
 
     def _get_candidates(self) -> list:
         """
-        TODO
+        Получает список кандидатов
         """
-        result = requests.get(f"{self.url}/candidates")
-        if result.status_code == 200:
-            result = result.json()
-            return result
+        response = requests.get(f"{self.url}/candidates")
+        if response.status_code == 200:
+            candidates_list = response.json()
+            return candidates_list
 
     def _get_candidates_skills(self) -> tuple:
         """
-        TODO
+        Итерируется по списку кандидатов, получает подробную инфу по каждому и добавляет в список
         """
-        # на такого размера кусках кода уже можно немного комментить
         results = []
         error_count = None
-        candidates_names = self._get_candidates()
-        # внимательней к названиям.
-        for candidate_name in candidates_names:
-            res = requests.get(f"{self.url}/candidates/{candidate_name}")
-            if res.status_code == 200:
-                candidate_data = res.json() # не удачная практика переиспользования переменнной. имён можно придумать оч много, отражающих смысл того, что в переменной сейчас находится.
+        candidates_list = self._get_candidates()
+        for candidate_name in candidates_list:
+            response = requests.get(f"{self.url}/candidates/{candidate_name}")
+            if response.status_code == 200:
+                candidate_data = response.json()
                 candidate_data__validated = self._validate_skills(candidate_data)
+                # Валидируем полученные данные и в случае ошибки 
                 if candidate_data__validated:
-                    results.append(res)
+                    results.append(candidate_data)
                 else:
-                    error_count += 1
+                    # Возник вопрос: имеет ли смысл error_count делать None, ведь
+                    # в случае ошибки валидации нет возможности в самом цикле изменить
+                    # тип на список и начать туда добавлять ошибки, так как при 
+                    # следующей итерации все перезапишется. Я думаю, будет удобнее
+                    # задать error_count = 0, либо пустой список
+                    error_count = []
         return results, error_count
 
     def _validate_skills(self, data: dict) -> bool:
         """
-        TODO
+        Валидирует полученные данные
         """
         for name, property in data.items():
             try:
@@ -65,7 +58,7 @@ class QueriesToServer:
 
     def get_data(self) -> tuple:
         """
-        TODO
+        Основная функция, которая возвращает подробный список кандидатов и ошибки
         """
         result, errors = self._get_candidates_skills()
         return result, errors
