@@ -1,9 +1,10 @@
 from flask import Flask, jsonify
-from services import QueryData
-from config import QueryToServerConfig
+from .services import QueryData
+from .config import QueryToServerConfig
 
 
 app = Flask(__name__)
+client = app.test_client() # Клиент для тестирования
 
 
 @app.route('/candidates', methods=['GET'])
