@@ -1,6 +1,5 @@
 class QueryToServerConfig:
     """
-    TODO
+    класс с конфигами
     """
-    #TODO написать объект-конфиг и передавать в инициализатор сервиса, реализующего работу с server
-    pass
+    url = 'http://localhost:8089'
