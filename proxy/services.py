@@ -5,6 +5,7 @@ class QueryData:
     """
     Класс для получения данных от server.
     """
+
     def __init__(self, QueryToServerConfig):
         """
         Инициализация класса с конфигами
@@ -21,29 +22,33 @@ class QueryData:
             candidates_list = response.json()
             return candidates_list
 
-    def _get_candidates_skills(self) -> tuple:
+    def get_candidates_skills(self) -> tuple:
         """
         Итерируется по списку кандидатов, получает подробную инфу по каждому и добавляет в список
         """
         results = []
-        error_count = None
+        error_list = []
         candidates_list = self._get_candidates()
         for candidate_name in candidates_list:
             response = requests.get(f"{self.url}/candidates/{candidate_name}")
             if response.status_code == 200:
                 candidate_data = response.json()
                 candidate_data__validated = self._validate_skills(candidate_data)
-                # Валидируем полученные данные и в случае ошибки 
+                # Валидируем полученные данные и в случае ошибки добавляем их в error_list
                 if candidate_data__validated:
                     results.append(candidate_data)
                 else:
-                    # Возник вопрос: имеет ли смысл error_count делать None, ведь
-                    # в случае ошибки валидации нет возможности в самом цикле изменить
-                    # тип на список и начать туда добавлять ошибки, так как при 
-                    # следующей итерации все перезапишется. Я думаю, будет удобнее
-                    # задать error_count = 0, либо пустой список
-                    error_count = []
-        return results, error_count
+                    error_list.append(candidate_data)
+        error_list_checked = self._check_errors(error_list)
+        return results, error_list_checked
+
+    def _check_errors(self, error_list: list):
+        """
+        Проверяет список с ошибками, в случае если он пуст - возвращает None
+        """
+        if len(error_list) == 0:
+            return None
+        return error_list
 
     def _validate_skills(self, data: dict) -> bool:
         """
@@ -55,10 +60,3 @@ class QueryData:
             except ValueError:
                 return False
         return True
-
-    def get_data(self) -> tuple:
-        """
-        Основная функция, которая возвращает подробный список кандидатов и ошибки
-        """
-        result, errors = self._get_candidates_skills()
-        return result, errors
