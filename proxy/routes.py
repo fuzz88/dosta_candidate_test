@@ -11,7 +11,8 @@ def get_candidates():
     """
     Делает запрос на server и возвращает полную информацию о кандидатах
     """
-    query = QueryData(QueryDataConfig)
+    configs = QueryDataConfig()
+    query = QueryData(configs.url)
     candidates_data, validation_errors = query.get_data()
     results = jsonify(candidates_data)
     if validation_errors is None:  # вот эту строчку изменять нельзя

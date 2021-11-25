@@ -6,12 +6,11 @@ class QueryData:
     Класс для получения данных от server.
     """
 
-    def __init__(self, QueryToServerConfig):
+    def __init__(self, url):
         """
         Инициализация класса с конфигами
         """
-        configs = QueryToServerConfig()
-        self.url = configs.url
+        self.url = url
 
     def _get_candidates(self) -> list:
         """
