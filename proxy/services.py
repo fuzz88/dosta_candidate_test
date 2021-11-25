@@ -9,7 +9,7 @@ class QueryData:
 
     def __init__(self, url):
         """
-        Инициализация класса с конфигами
+        url - роут для получения данных о кандидатах с server
         """
         self.url = url
 
