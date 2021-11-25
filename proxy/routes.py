@@ -12,10 +12,10 @@ def get_candidates():
     Делает запрос на server и возвращает полную информацию о кандидатах
     """
     configs = QueryDataConfig()
-    query = QueryData(configs.url)
-    candidates_data, validation_errors = query.get_data()
-    results = jsonify(candidates_data)
+    server_client = QueryData(configs.url)
+    candidates_data, validation_errors = server_client.get_candidates_skills()
+    result = jsonify(candidates_data)
     if validation_errors is None:  # вот эту строчку изменять нельзя
-        return (results, 200)
+        return (result, 200)
     else:
-        return (results, 206)
+        return (result, 206)
