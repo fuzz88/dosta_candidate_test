@@ -1,5 +1,5 @@
 from flask import Flask
-from .routes import blueprint
+from routes import blueprint
 
 
 app = Flask(__name__)

@@ -1,5 +1,5 @@
-from .services import QueryData
-from .config import QueryDataConfig
+from services import QueryData
+from config import QueryDataConfig
 from flask import Blueprint, jsonify
 
 
@@ -13,7 +13,7 @@ def get_candidates():
     """
     configs = QueryDataConfig()
     server_client = QueryData(configs.url)
-    candidates_data, validation_errors = server_client.get_candidates_skills()
+    candidates_data, validation_errors = server_client.get_data()
     result = jsonify(candidates_data)
     if validation_errors is None:  # вот эту строчку изменять нельзя
         return (result, 200)
