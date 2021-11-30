@@ -1,59 +1,68 @@
-import requests, json
+import requests
 
 
-# нейминг объектов самое интересное в программировании)
-# названия должны кратчайшим способом описывать финальное предназначение объекта.
-# это важно для читаемости. твой вариант не плох, но
-# смотри какие ещё есть: ServerData, ExternalAPI, QueryData ...
-class QueriesToServer:
+class QueryData:
     """
-    Здесь всегда должен располагаться doc-string, который описывает назначение класса.
-
-    Например:
-    класс для получения данных от server.
-
-    также производит валидацию данных. при ошибке валидации выкидывает CustomValidationError.
+    Получает данные о кандидатах от server.
+    Валидирует их и объединяет в общую структуру.
     """
 
-    def __init__(self, url: str) -> None:
+    def __init__(self, url):
         """
-        TODO
+        url - роут для получения данных о кандидатах с server
         """
-        # вот сюда нужно передать объект конфигурации с этим урлом
         self.url = url
 
     def _get_candidates(self) -> list:
         """
-        TODO
+        Получает список кандидатов
         """
-        result = requests.get(f"{self.url}/candidates")
-        if result.status_code == 200:
-            result = result.json()
-            return result
+        response = requests.get(f"{self.url}/candidates")
+        if response.status_code == 200:
+            candidates_list = response.json()
+            return candidates_list
 
-    def _get_candidates_skills(self) -> tuple:
+    def _get_candidates_skills(self) -> list:
         """
-        TODO
+        Итерируется по списку кандидатов, получает подробную инфу по каждому и добавляет в список.
         """
-        # на такого размера кусках кода уже можно немного комментить
-        results = []
-        error_count = None
-        candidates_names = self._get_candidates()
-        # внимательней к названиям.
-        for candidate_name in candidates_names:
-            res = requests.get(f"{self.url}/candidates/{candidate_name}")
-            if res.status_code == 200:
-                candidate_data = res.json() # не удачная практика переиспользования переменнной. имён можно придумать оч много, отражающих смысл того, что в переменной сейчас находится.
-                candidate_data__validated = self._validate_skills(candidate_data)
-                if candidate_data__validated:
-                    results.append(res)
-                else:
-                    error_count += 1
-        return results, error_count
+        candidates_skills = []
+        candidates_list = self._get_candidates()
+        for candidate_name in candidates_list:
+            response = requests.get(f"{self.url}/candidates/{candidate_name}")
+            if response.status_code == 200:
+                candidate_data = response.json()
+                candidates_skills.append(candidate_data)
+        return candidates_skills
+
+    def get_data(self):
+        """
+        Валидирует данные полученные с server и в случае ошибки добавляет
+        их в error_list
+        """
+        error_list = []
+        result = []
+        candidates_skills = self._get_candidates_skills()
+        for candidate_data in candidates_skills:
+            candidate_data__validated = self._validate_skills(candidate_data)
+            if candidate_data__validated:
+                result.append(candidate_data)
+            else:
+                error_list.append(candidate_data)
+        error_list_checked = self._check_errors(error_list)
+        return result, error_list_checked
+
+    def _check_errors(self, error_list: list):
+        """
+        Проверяет список с ошибками, в случае если он пуст - возвращает None
+        """
+        if len(error_list) == 0:
+            return None
+        return error_list
 
     def _validate_skills(self, data: dict) -> bool:
         """
-        TODO
+        Валидирует полученные данные
         """
         for name, property in data.items():
             try:
@@ -61,10 +70,3 @@ class QueriesToServer:
             except ValueError:
                 return False
         return True
-
-    def get_data(self) -> tuple:
-        """
-        TODO
-        """
-        result, errors = self._get_candidates_skills()
-        return result, errors
