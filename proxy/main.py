@@ -1,4 +1,4 @@
-from typing import Optional
+# python 3.9
 
 from fastapi import FastAPI, responses, exceptions
 from pydantic import BaseModel, ValidationError, validator
@@ -33,6 +33,8 @@ def candidates():
     if response.reason_phrase != 'OK':
         raise exceptions.HTTPException(response.status_code)
     candidates = response.json()
+    if candidates is None or not isinstance(candidates, list):
+        raise exceptions.HTTPException(404)
 
     # Получаем параметры каждого кандидата
     if candidates:
@@ -50,14 +52,14 @@ def candidates():
                 except ValidationError as e:
                     errors[candidate] = e.errors()
             else:
-                exceptions.HTTPException(404)
+                errors[candidate] = 'Not found'
 
         # Если есть ошибки валидации возвращаем 206 и список валидных кандидатов
         if errors:
             result['errors'] = errors
             return responses.JSONResponse(content=result, status_code=206)
         else:
-            return result
+            return responses.JSONResponse(content=result, status_code=200)
     else:
         exceptions.HTTPException(404)
 
